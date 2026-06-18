@@ -1,0 +1,34 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins: "*"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+            allowedHeaders: "*"
+      server:
+        webflux:
+          routes:
+            - id: ms-identity
+              uri: ${MS_IDENTITY_URI:http://localhost:8081}
+              predicates:
+                - Path=/api/auth/**
+            - id: ms-reporting
+              uri: ${MS_REPORTING_URI:http://localhost:8082}
+              predicates:
+                - Path=/api/reportes/**
+            - id: ms-geolocation
+              uri: ${MS_GEOLOCATION_URI:http://localhost:8083}
+              predicates:
+                - Path=/api/geo/**
