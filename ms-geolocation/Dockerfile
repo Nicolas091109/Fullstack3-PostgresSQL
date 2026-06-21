@@ -1,11 +1,12 @@
-# Usamos una imagen oficial de Java 21
-FROM eclipse-temurin:21-jdk-alpine
-
-# Definimos un directorio de trabajo dentro del contenedor
+# Stage 1: Build the application
+FROM maven:3.9.6-eclipse-temurin-21-alpine AS build
 WORKDIR /app
+COPY pom.xml .
+COPY src ./src
+RUN mvn clean package -DskipTests
 
-# Copiamos el archivo .jar compilado al contenedor
-COPY target/*.jar app.jar
-
-# Comando para ejecutar la aplicación
+# Stage 2: Run the application
+FROM eclipse-temurin:21-jre-alpine
+WORKDIR /app
+COPY --from=build /app/target/*.jar app.jar
 ENTRYPOINT ["java", "-jar", "app.jar"]
